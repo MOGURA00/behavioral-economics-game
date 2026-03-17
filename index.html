@@ -466,7 +466,8 @@
     </div>
 
     <div class="share-section">
-      <button class="btn-secondary" onclick="shareResult()">結果をシェア</button>
+      <button class="btn-secondary" onclick="shareToX()" style="background:rgba(0,0,0,0.3); border-color:#1da1f2; color:#1da1f2;">𝕏 でシェア</button>
+      <button class="btn-secondary" onclick="shareResult()">リンクをコピー</button>
       <button class="btn-primary" onclick="retryGame()" style="padding:12px 32px; font-size:0.95em;">もう一度診断する</button>
     </div>
 
@@ -1158,6 +1159,8 @@ function startGame() {
   currentIndex = 0;
   scores = { rationality: 0, system: 0, lossAversion: 0, timeOrientation: 0 };
 
+  gtag('event', 'diagnosis_start', { event_category: 'engagement' });
+
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('game-screen').style.display = 'block';
   document.getElementById('result-screen').style.display = 'none';
@@ -1212,6 +1215,11 @@ function startTimer() {
     if (elapsed >= TIMER_DURATION) {
       clearInterval(timerInterval);
       scores.system -= 1;
+      gtag('event', 'question_timeout', {
+        event_category: 'engagement',
+        question_number: currentIndex + 1,
+        question_category: currentQuestions[currentIndex].category
+      });
       nextQuestion();
     }
   }, 100);
@@ -1224,6 +1232,14 @@ function selectChoice(idx) {
   const choice = q.choices[idx];
 
   const elapsed = (Date.now() - timerStart) / 1000;
+
+  gtag('event', 'question_answer', {
+    event_category: 'engagement',
+    question_number: currentIndex + 1,
+    question_category: q.category,
+    choice_index: idx,
+    response_time: Math.round(elapsed * 10) / 10
+  });
   if (elapsed < 3) {
     scores.system -= 1;
   } else if (elapsed > 15) {
@@ -1271,6 +1287,15 @@ function showResult() {
 
   const typeName = getTypeName(rationalPct, systemPct, lossAversionPct, timePct);
   document.getElementById('type-name').textContent = typeName;
+
+  gtag('event', 'diagnosis_complete', {
+    event_category: 'engagement',
+    result_type: typeName,
+    rational_pct: rationalPct,
+    system_pct: systemPct,
+    loss_aversion_pct: lossAversionPct,
+    time_pct: timePct
+  });
 
   const gauges = [
     { left: '合理的', right: '非合理的', value: rationalPct, color1: '#4ecdc4', color2: '#ff6584' },
@@ -1416,6 +1441,11 @@ function shareResult() {
   const typeName = document.getElementById('type-name').textContent;
   const text = `行動経済学診断の結果、私は「${typeName}」でした！あなたの脳のクセも暴かれる→`;
 
+  gtag('event', 'share_click', {
+    event_category: 'engagement',
+    result_type: typeName
+  });
+
   if (navigator.share) {
     navigator.share({ title: '行動経済学診断 — あなたの脳のクセを暴く10問', text: text });
   } else if (navigator.clipboard) {
@@ -1427,7 +1457,23 @@ function shareResult() {
   }
 }
 
+function shareToX() {
+  const typeName = document.getElementById('type-name').textContent;
+  const text = `行動経済学診断の結果、私は「${typeName}」でした！\nあなたの脳のクセも暴かれる👇`;
+  const url = 'https://mogura00.github.io/behavioral-economics-game/';
+  const hashtags = '行動経済学,診断';
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+
+  gtag('event', 'share_to_x', {
+    event_category: 'engagement',
+    result_type: typeName
+  });
+
+  window.open(twitterUrl, '_blank', 'width=550,height=420');
+}
+
 function retryGame() {
+  gtag('event', 'retry_click', { event_category: 'engagement' });
   document.getElementById('result-screen').style.display = 'none';
   startGame();
 }
@@ -1512,6 +1558,14 @@ function renderBookCarousel(containerId) {
     card.style.cssText = 'min-width:200px; max-width:200px; background:var(--card); border:1px solid rgba(108,99,255,0.15); border-radius:14px; padding:16px; text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:6px; transition:transform 0.2s, border-color 0.2s; flex-shrink:0;';
     card.onmouseover = () => { card.style.transform='translateY(-3px)'; card.style.borderColor='var(--accent1)'; };
     card.onmouseout = () => { card.style.transform=''; card.style.borderColor='rgba(108,99,255,0.15)'; };
+    card.onclick = () => {
+      gtag('event', 'book_click', {
+        event_category: 'monetization',
+        book_title: book.title,
+        book_author: book.author,
+        carousel_location: containerId
+      });
+    };
 
     card.innerHTML = `
       <div style="font-size:2em; margin-bottom:4px;">${book.emoji}</div>

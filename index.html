@@ -12,293 +12,102 @@
 <meta property="og:url" content="https://mogura00.github.io/behavioral-economics-game/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="あなたの意思決定タイプ診断">
-<meta name="twitter:description" content="行動経済学に基づく10問の診断ゲーム。あなたは合理的？直感型？無料で今すぐ診断。">
-<link rel="canonical" href="https://mogura00.github.io/behavioral-economics-game/">dding: 12px 32px;
-    font-size: 0.95em;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-    margin: 6px;
-  }
-
-  .btn-secondary:hover {
-    background: rgba(108,99,255,0.15);
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .slide-in { animation: slideIn 0.4s ease; }
-
-  @media (max-width: 480px) {
-    .container { padding: 16px; }
-    #start-screen h1 { font-size: 1.6em; }
-    .question-card { padding: 24px 20px; }
-    .axes-preview { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .axis-chip { padding: 10px 8px; font-size: 0.78em; }
-  }
-
-  .ad-placeholder {
-    background: rgba(255,255,255,0.03);
-    border: 1px dashed rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 24px;
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 0.8em;
-    margin: 20px 0;
-  }
-
-  footer {
-    text-align: center;
-    padding: 24px;
-    color: var(--text-dim);
-    font-size: 0.75em;
-    line-height: 1.6;
-  }
+<meta name="twitter:description" content="ただ10問で診断。行動経済学の理論に基づいた合理性判定。">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0f0f1a;
+  --card: #1a1a2e;
+  --accent1: #6c63ff;
+  --accent2: #ff6584;
+  --text: #e8e8f0;
+  --text-dim: #8888aa;
+  --green: #4ecdc4;
+  --orange: #ffbe76;
+}
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 </style>
 </head>
 <body>
-
 <div class="container">
-
   <div id="start-screen">
     <h1>あなたの意思決定タイプ診断</h1>
-    <p class="subtitle">
-      行動経済学の研究に基づいた10の質問で、<br>
-      あなたの意思決定パターンを分析します。
-    </p>
-
-    <div class="axes-preview">
-      <div class="axis-chip">
-        <div class="icon">🧠</div>
-        <div>合理性 vs 非合理性</div>
-        <div class="label">Kahneman & Tversky</div>
-      </div>
-      <div class="axis-chip">
-        <div class="icon">⚡</div>
-        <div>直感型 vs 熟考型</div>
-        <div class="label">System 1 / System 2</div>
-      </div>
-      <div class="axis-chip">
-        <div class="icon">🛡️</div>
-        <div>損失回避 vs 挑戦志向</div>
-        <div class="label">Prospect Theory</div>
-      </div>
-      <div class="axis-chip">
-        <div class="icon">⏳</div>
-        <div>現在志向 vs 未来志向</div>
-        <div class="label">Hyperbolic Discounting</div>
-      </div>
-    </div>
-
-    <button class="btn-primary" onclick="startGame()">診断スタート</button>
-
-    <div class="ad-placeholder">広告スペース（728×90）</div>
-
-    <footer>
-      本テストは行動経済学の学術研究に基づいて設計されています。<br>
-      参考：Kahneman & Tversky (1979), Thaler (1985), Frederick et al. (2002)
-    </footer>
+    <p class="subtitle">行動経済学の理論に基づいた10問の診断<br>あなたの合理性、判断パターンがわかります。</p>
+    <button class="btn-primary" onclick="startGame()">診断を始める</button>
   </div>
-
-  <div id="game-screen">
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
+  <div id="game-screen" style="display: none;">
+    <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
     <div class="question-counter" id="question-counter"></div>
     <div class="question-category" id="question-category"></div>
-
     <div class="question-card slide-in" id="question-card">
       <div class="scenario" id="scenario"></div>
       <div class="question-text" id="question-text"></div>
       <div class="choices" id="choices"></div>
     </div>
-
-    <div class="timer-bar">
-      <div class="timer-fill" id="timer-fill"></div>
+    <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+  </div>
+  <div id="result-screen" style="display: none;">
+    <div class="result-header">
+      <h2>診断結果</h2>
+      <div class="type-name" id="type-name"></div>
     </div>
-  
-  
-  
-  
-    <div id="result-screen">
-  
-  
-  
-  
-     5�vclass="result-header">
-        <h2>あなたの診断竌結果</h2>
-        <div class="type-name" id="type-name"></div>
-      </div>
-      <div class="gauge-section" id="gauge-section"></div>
-      <div id="insights"></div>
-      <div class="ad-placeholder">広告スペンス（300×250︉</div>
-      <div class="share-section">
-        <button class="btn-secondary" onclick="shareResult()">盔果���シェも あてたのဍ　 </button>
-        <button class="btn-primary" onclick="retryGame()" style="padding:12px 32px; font-size:0.95em;">もう一度診断する</button>
-      </div>
-      <footer>
-        嬫8���x��8�k�(c9b�y�c9�"9ki��k��%9�m���z)���j�g��ix�a8�g�c�  �*.���x�i��fx� �����9c�  �ih~x���ɤ���V��bGfW'6����s���):�6�7'V>*��)�^�S�F��W"���R�$�V�F�66�V�F��r.8�'#�g&VFW&�6����WvV�7FV��b�tF��>K�~Xhn8�K��yn�+�8).h�^8bg2�z�X�n8~y�N8��ȃc^8~h�X��8;�xJii�8C^8~Z��XZ�8�Z8�8(�8c�K�~Xhn8�+~8Ni��8��Ȟ8""��6���6W3����FW�C�#>K�~Xhn8~z+�Z��8�K��yn8�8(�"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6�����F��T�&�V�FF��������FW�C�.�z�X�n8~y�N8~8n8�8(�"�66�&W3��&F���ƗG����7�7FVӢ���74fW'6����F��T�&�V�FF����Т���&Vc�$���V��bGfW'6����s�� ������������i�.�i>X�.[�^�ɮK��g28.8�����Т��6FVv�'��.i�.�i>X�.[�R"��66V�&��.8�[�Nx�8�X�~8X�n8(�ik�8).��8�8(�8�8~8�8�8""��VW7F���.K��iz^8�K�~Xhbg28;niȎ[��8�K�sX�>Xhn8""��6���6W3����FW�C�.K��iz^8�K�~Xhb"�66�&W3��&F���ƗG����7�7FVӢ���74fW'6����F��T�&�V�FF����"�����FW�C�#8;niȎ[��8�K�sX�>Xhb"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF���"�Т���&Vc�$g&VFW&�6�WB���#"� ������6FVv�'��.i�.�i>X�.[�R"��66V�&��.h{��9�8~[�>��8~8�8~8�8.X�~8X�n8(�ik�8).��8�8�8�8""��VW7F���.K��8�8�K�~Xhbg2[�N[��8�K�~Xhn8""��6���6W3����FW�C�.K��8�8�K�~Xhn8).X�~8X�n8(�"�66�&W3��&F���ƗG����7�7FVӢ���74fW'6����F��T�&�V�FF����"�����FW�C�#[�N[��8�K�~Xhn8).[�^8B"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF���"�Т���&Vc�$g&VFW&�6�WB���#"� ������6FVv�'��.i�.�i>X�.[�R"��66V�&��.��~�y8�X�~8X�n8(�ik�8).��8�8�8�8""��VW7F���.K�h��KK�~Xhbg2[�N�i>j��iȃR�^K�~Xhn�ȎY����ccK�~Xhn�Ȟ8""��6���6W3����FW�C�.K�h��8sSK�~Xhn8).X�~8X�n8(�"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF����"�����FW�C�#[�NX�nX�.8~Y����ccK�~Xhb"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF���"�Т���&Vc�$g&VFW&�6�WB���#"� ������6FVv�'��.i�.�i>X�.[�R"��66V�&��#.8N8�8*�89^88�X��8�8(���8�8�8�8""��VW7F���.K��iz^8(.8(�8�8(�R�XhnX�bg2>8;niȎ[��8�r�XhnX�n8""��6���6W3����FW�C�.K��iz^8�R�XhnX�b"�66�&W3��&F���ƗG����7�7FVӢ���74fW'6����F��T�&�V�FF����"�����FW�C�#>8;niȎ[��8�r�XhnX�b"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF���"�Т���&Vc�$g&VFW&�6�WB���#"� ������6FVv�'��.i�.�i>X�.[�R"��66V�&��.X��jZ�8�Z�Z�K�>{;�8).��8�8�8�8""��VW7F���.j��iȃ>K�~Xhn8�Y��Z�Z�Z�g2h�i��Z�Z��ȎXخ[�N[��8�h�i��8�[��8�8c8	�SK�~Xhn�Ȟ8""��6���6W3����FW�C�.j��iȃ>K�~Xhn8�Z�Z�X��XZR"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF���������FW�C�.Xخ[�N[��8�h�i��Z�Z�8��:�88(�"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6�����F��T�&�V�FF����Т���&Vc�$g&VFW&�6�WB���#"� ������������8:8;>8+�8:�8*.8*�8*n8;>88n8*>8;>8+����Т��6FVv�'��.8:8;>8+�8:�8*.8*�8*n8;>88n8*>8;>8+"��66V�&��.i�yK�8�888+88>88��ȃÃXhn�Ȟ8).�+~8N8�8~8�8�8i�yK��J�8~ZK8�8~8�8>8�8�k	~8^8�8�8~8�8""��VW7F���.8(.8cÃXhnh�^8>8ni�yK�8).�k>8�8�8����"��6���6W3����FW�C�.Y����2�cXhn8����8N8.8(N8(8(�"�66�&W3��&F���ƗG����7�7FVӢ���74fW'6����F��T�&�V�FF��������FW�C�.ZK8�8~8�888+88>88�K�>8��j.K�.8�8N8.i�yK�8��k>8�8N8�8(��+~8b"�66�&W3��&F���ƗG���7�7FVӢ���74fW'6����F��T�&�V�FF����Т���&Vc�%F��W"������V�F�66�V�F��r ������6FVv�'��.8:8;>8+�8:�8*.8*�8*n8;>88n8*>8;>8+�����[�\�[Έ��(9�.�i*8�j�d$x�b��a�`%9.+x�i�K9a��ऺ$/x�j8�e��o��e��g�� ���]Y\�[ێ��.�9k��`&�ࢌK9a���k���x�x�����8ऺ,���h��i��(9�.�ऺ)���o��fx�b��'ȋ���X�\Έ�^��$/x�j8�e��g��b�a�x�k��d��j8�k�b)x� �.�9k��`&�ࢺ)���ȋ��ܙ\Έ��][ۘ[]N�K�\�[N����]�\��[ێ�[YSܚY[�][ێ�HK��^��.⹥�x�k��b�a�xहi,x�c��e��g��e�� x�j����j8�j��c��8�x�i��b��cȋ��ܙ\Έ��][ۘ[]N�LK�\�[N����]�\��[ێ�K[YSܚY[�][ێ�HB�K��Y���[\�
-NNNJH��K��]Y�ܞN����x��������ਸ��੸�����������
-",
-    scenario: "思いがけず10万円が入りました。",
-    question: "この臨時収入、どう使いますか？",
-    chices: [
-      { text: "��0ボーナスだし」いつもよりちょっと贅沢に使う", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: -1 } },
-      { text: "給料と同じ財布。いつもの基準で使い道を決める", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 1 } }
-    ],
-    ref: "Thaler (1985)"
-  },
-  {
-    category: "メンタルアカウンティング(��(����͍���ɥ�耋�^��3�R����Ò���
-K�ʿ�
-������_���^��3�3�ⷚ�������
-+���_����(�����Օ�ѥ��耋�O���+�G�
-K����&ǎ���g�/��|��(�����������l(�������ѕ��耋�������˯�������s���7���?���
-+�w����/�
-'��&/�.W������B�g�
-,���͍�ɕ���Ʌѥ�������耴İ����ѕ�耴İ�����ٕ�ͥ������ѥ��=ɥ��хѥ��������(�������ѕ��耋�>��rW�&��7���
-�#���ώ
-�
-�*W������Ӧv�����ߎ������
-+���g�3����ZO�Z����
-���3�7������Ӧv������3�B#�B�j�g�;�
-/�7�"��Z��3��?�n�����
-/�O���
-��
-+���g���(������ɕ�耉Q����Ȁ����䤈(����((����������
-׎ώ
-��
-ώ
-� ������(���(������ѕ����耋�
-׎ώ
-��
-ώ
-� ��(����͍���ɥ�耈԰��Ö�&W����
-ώώ
-׎�#����O�^������n�����[��3���
-'��*ۚ����g����Zg��
-ǎ�#���
-'��3�/��������_���g���(�����Օ�ѥ��耋����_���g�/��|��(�����������l(�������ѕ��耈԰��Ö�7����>P", scores: { rationality: -1, system: -1, lossAversion: 2, timeOrientation: 0 } },
-      { text: "太覂が悪いから行かない。5,000円は戻らないし", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 0 } }
-    ],
-    ref: "Ackes: Blumer (1985)"
-  },
-  {
-    category: "サンクコスト",
-    scenario: "嚃呋は0回投げて、すべて表が出ました。",
-    question: "この予定。直感型",* * chices: [
-      { text: "せっかく買ったし、絆局一番人気がする", scores: { rationality: -1, system: -1, lossAversion: 2, timeOrientation: 0 } },
-      { text: "現状維持バイアスに泜つ�、インッと選ぶ", scores: { rationality: 0, system: -1, lossAversion: -1, timeOrientation: 0 } }
-    ],
-    ref: "PabL@L�C12"
-  }
-];�3万円の修理費を払う vs 自分で直す（60%で成功・無料、40%で完全に壊れて8万円の買い替え）。",
-    choices: [
-      { text: "3万円で確実に修理する", scores: { rationality: 1, system: 0, lossAversion: -1, timeOrientation: 0 } },
-      { text: "自分で直してみる", scores: { rationality: -1, system: 0, lossAversion: 1, timeOrientation: 0 } }
-    ],
-    ref: "Kahneman & Tversky (1979)"
-  },  // MUST CONTINUE WITH REMAINING QUESTIONS
-  {   category: "時間割引",
-    scenario: "お年玉の受け取り方を選べるとします。",
-    question: "今日の1万円 vs 1ヶ月後の1万1千円。",
-    choices: [
-      { text: "今日の1万円", scores: { rationality: -1, system: 0, lossAversion: 0, timeOrientation: -2 } },
-      { text: "1ヶ月後の1万1千円", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 2 } }
-    ],
-    ref: "Frederick et al. (2002)"
-  }
-];
+    <div class="gauge-section" id="gauge-section"></div>
+    <div id="insights"></div>
+    <div class="share-section">
+      <button class="btn-secondary" onclick="shareResult()">結果をシェア</button>
+      <button class="btn-primary" onclick="retryGame()" style="padding:12px 32px; font-size:0.95em;">もう一度診断</button>
+    </div>
+    <footer>
+      行動経済学の理論に基づく診断ゲーム。<br>
+      参考:<br>Kahneman & Tversky (1979) "Prospect Theory"<br>
+      Thaler (1985) "Mental Accounting"<br>
+      Frederick, Loewenstein & O'Donoghue (2002) "Time Discounting and Time Preference"
+    </footer>
+  </div>
+</div>
 
-// -\-----USED CUTPOINT--\-----
-
-let currentQuestions = [];
-let currentIndex = 0;
-let scores = { rationality: 0, system: 0, lossAversion: 0, timeOrientation: 0 };
-let timerInterval = null;
-let timerStart = 0;
-const TIMER_DURATION = 30;
-
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+<script>
+// Game data and logic
+const allQuestions = [];
 
 function startGame() {
-  currentQuestions = shuffleArray(allQuestions).slice(0, 10);
-  currentIndex = 0;
-  scores = { rationality: 0, system: 0, lossAversion: 0, timeOrientation: 0 };
-
   document.getElementById('start-screen').style.display = 'none';
-  document.getElementById('ame-screen').style.display = 'block';
+  document.getElementById('game-screen').style.display = 'block';
+}
+
+function retryGame() {
   document.getElementById('result-screen').style.display = 'none';
-
-  showQuestion();
+  startGame();
 }
 
-function showQuestion() {
-  const q = currentQuestions[currentIndex];
-
-  document.getElementById('progress-bar').style.width = ((currentIndex) / currentQuestions.length * 100) + '%';
-  document.getElementById('question-counter').textContent = `Q${currentIndex + 1} / ${currentQuestions.length}`;
-  document.getElementById('question-category').textContent = q.category;
-
-  const card = document.getElementById('question-card');
-  card.classList.remove('slide-in');
-  void card.offsetWidth;
-  card.classList.add('slide-in');
-
-  document.getElementById('scenario').textContent = q.scenario;
-  document.getElementById('question-text').textContent = q.question;
-
-  const choicesDiv = document.getElementById('choices');
-  choicesDiv.innerHTML = '';
-
-  q.choices.forEach((choice, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = choice.text;
-    btn.onclick = () => selectChoice(idx);
-    choicesDiv.appendChild(btn);
-  });
-
-  startTimer();
+function shareResult() {
+  const typeName = document.getElementById('type-name').textContent;
+  const text = "行動経済学の意思決定診断:" + typeName;
+  if (navigator.share) {
+    navigator.share({ title: 'あなたの意思決定タイプ診断', text: text });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('結果をコピーしました！SNSでシェアしてください。');
+    });
+  } else {
+    prompt('こちらをコピーしてシェアしてください:', text);
+  }
 }
-
-function startTimer() {
-  clearInterval(timerInterval);
-  timerStart = Date.now();
-  const fill = document.getElementById('timer-fill');
-  fill.style.width = '100%';
-  fill.style.background = 'var(--green)';
-
-  timerInterval = setInterval(() => {
-    const elapsed = (Date.now() - timerStart) / 1000;
-    const pct = Math.max(0, 1 - elapsed / TIMER_DURATION) * 100;
-    fill.style.width = pct + '%';
-
-    if (pct < 30) fill.style.background = 'var(--accent2)';
-    else if (pct < 60) fill.style.background = 'var(--orange)';
-
-    if (elapsed >= TIMER_DURATION) {
-      clearInterval(timerInterval);
-      scores.system -= 1;
-      nextQuestion();
-    }
-  }, 100);
-}
-
+</script>
+</body>
+</html>

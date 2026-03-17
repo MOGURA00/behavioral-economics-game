@@ -12,102 +12,1400 @@
 <meta property="og:url" content="https://mogura00.github.io/behavioral-economics-game/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="あなたの意思決定タイプ診断">
-<meta name="twitter:description" content="ただ10問で診断。行動経済学の理論に基づいた合理性判定。">
+<meta name="twitter:description" content="行動経済学に基づく10問の診断ゲーム。あなたは合理的？直感型？無料で今すぐ診断。">
+<link rel="canonical" href="https://mogura00.github.io/behavioral-economics-game/">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --bg: #0f0f1a;
-  --card: #1a1a2e;
-  --accent1: #6c63ff;
-  --accent2: #ff6584;
-  --text: #e8e8f0;
-  --text-dim: #8888aa;
-  --green: #4ecdc4;
-  --orange: #ffbe76;
-}
-body {
-  font-family: 'Noto Sans JP', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-.container {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 20px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --accent1: #6c63ff;
+    --accent2: #ff6584;
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+    --green: #4ecdc4;
+    --orange: #ffbe76;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #start-screen {
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+
+  #start-screen h1 {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  #start-screen .subtitle {
+    color: var(--text-dim);
+    font-size: 1em;
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  .axes-preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .axis-chip {
+    background: var(--card);
+    border: 1px solid rgba(108,99,255,0.2);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    font-size: 0.85em;
+  }
+
+  .axis-chip .icon { font-size: 1.6em; margin-bottom: 6px; }
+  .axis-chip .label { color: var(--text-dim); font-size: 0.8em; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent1), #8b5cf6);
+    color: #fff;
+    border: none;
+    padding: 16px 48px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(108,99,255,0.4);
+  }
+
+  #game-screen { display: none; animation: fadeIn 0.5s ease; }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .question-counter {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85em;
+    margin-bottom: 8px;
+  }
+
+  .question-category {
+    text-align: center;
+    font-size: 0.75em;
+    color: var(--accent1);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .question-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px 28px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(108,99,255,0.15);
+  }
+
+  .scenario {
+    font-size: 0.88em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+
+  .question-text {
+    font-size: 1.15em;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .choice-btn {
+    background: rgba(108,99,255,0.08);
+    border: 1px solid rgba(108,99,255,0.2);
+    color: var(--text);
+    padding: 16px 20px;
+    border-radius: 14px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    font-family: inherit;
+    line-height: 1.5;
+  }
+
+  .choice-btn:hover {
+    background: rgba(108,99,255,0.18);
+    border-color: var(--accent1);
+    transform: translateX(4px);
+  }
+
+  .choice-btn.selected {
+    background: rgba(108,99,255,0.25);
+    border-color: var(--accent1);
+  }
+
+  .timer-bar {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+
+  .timer-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+  }
+
+  #result-screen { display: none; animation: fadeIn 0.8s ease; }
+
+  .result-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .result-header h2 {
+    font-size: 1.8em;
+    margin-bottom: 8px;
+  }
+
+  .result-header .type-name {
+    font-size: 1.4em;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .gauge-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .gauge-item {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px 24px;
+    border: 1px solid rgba(108,99,255,0.12);
+  }
+
+  .gauge-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+    margin-bottom: 10px;
+  }
+
+  .gauge-label .left { color: var(--green); }
+  .gauge-label .right { color: var(--accent2); }
+
+  .gauge-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gauge-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 1.2s ease;
+  }
+
+  .gauge-value {
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: 700;
+    margin-top: 8px;
+  }
+
+  .insight-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--accent1);
+  }
+
+  .insight-card h3 {
+    font-size: 1em;
+    margin-bottom: 8px;
+    color: var(--accent1);
+  }
+
+  .insight-card p {
+    font-size: 0.9em;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .reference {
+    font-size: 0.75em;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  .share-section {
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+    padding: 12px 32px;
+    font-size: 0.95em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    margin: 6px;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(108,99,255,0.15);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .slide-in { animation: slideIn 0.4s ease; }
+
+  @media (max-width: 480px) {
+    .container { padding: 16px; }
+    #start-screen h1 { font-size: 1.6em; }
+    .question-card { padding: 24px 20px; }
+    .axes-preview { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .axis-chip { padding: 10px 8px; font-size: 0.78em; }
+  }
+
+  .ad-placeholder {
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.8em;
+    margin: 20px 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-dim);
+    font-size: 0.75em;
+    line-height: 1.6;
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
+
   <div id="start-screen">
     <h1>あなたの意思決定タイプ診断</h1>
-    <p class="subtitle">行動経済学の理論に基づいた10問の診断<br>あなたの合理性、判断パターンがわかります。</p>
-    <button class="btn-primary" onclick="startGame()">診断を始める</button>
+    <p class="subtitle">
+      行動経済学の研究に基づいた10の質問で、<br>
+      あなたの意思決定パターンを分析します。
+    </p>
+
+    <div class="axes-preview">
+      <div class="axis-chip">
+        <div class="icon">🧠</div>
+        <div>合理性 vs 非合理性</div>
+        <div class="label">Kahneman & Tversky</div>
+      </div>
+      <div class="axis-chip">
+        <div class="icon">⚡</div>
+        <div>直感型 vs 熟考型</div>
+        <div class="label">System 1 / System 2</div>
+      </div>
+      <div class="axis-chip">
+        <div class="icon">🛡️</div>
+        <div>損失回避 vs 挑戦志向</div>
+        <div class="label">Prospect Theory</div>
+      </div>
+      <div class="axis-chip">
+        <div class="icon">⏳</div>
+        <div>現在志向 vs 未来志向</div>
+        <div class="label">Hyperbolic Discounting</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startGame()">診断スタート</button>
+
+    <div class="ad-placeholder">広告スペース（728×90）</div>
+
+    <footer>
+      本テストは行動経済学の学術研究に基づいて設計されています。<br>
+      参考：Kahneman & Tversky (1979), Thaler (1985), Frederick et al. (2002)
+    </footer>
   </div>
-  <div id="game-screen" style="display: none;">
-    <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
+
+  <div id="game-screen">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
     <div class="question-counter" id="question-counter"></div>
     <div class="question-category" id="question-category"></div>
+
     <div class="question-card slide-in" id="question-card">
       <div class="scenario" id="scenario"></div>
       <div class="question-text" id="question-text"></div>
       <div class="choices" id="choices"></div>
     </div>
-    <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+
+    <div class="timer-bar">
+      <div class="timer-fill" id="timer-fill"></div>
+    </div>
   </div>
-  <div id="result-screen" style="display: none;">
+
+  <div id="result-screen">
     <div class="result-header">
-      <h2>診断結果</h2>
+      <h2>あなたの診断結果</h2>
       <div class="type-name" id="type-name"></div>
     </div>
+
     <div class="gauge-section" id="gauge-section"></div>
+
     <div id="insights"></div>
+
+    <div class="ad-placeholder">広告スペース（300×250）</div>
+
     <div class="share-section">
       <button class="btn-secondary" onclick="shareResult()">結果をシェア</button>
-      <button class="btn-primary" onclick="retryGame()" style="padding:12px 32px; font-size:0.95em;">もう一度診断</button>
+      <button class="btn-primary" onclick="retryGame()" style="padding:12px 32px; font-size:0.95em;">もう一度診断する</button>
     </div>
+
     <footer>
-      行動経済学の理論に基づく診断ゲーム。<br>
-      参考:<br>Kahneman & Tversky (1979) "Prospect Theory"<br>
-      Thaler (1985) "Mental Accounting"<br>
+      本テストは行動経済学の研究知見に基づいた参考診断です。<br>
+      参考文献：Kahneman & Tversky (1979) "Prospect Theory"、Thaler (1985) "Mental Accounting"、<br>
       Frederick, Loewenstein & O'Donoghue (2002) "Time Discounting and Time Preference"
     </footer>
   </div>
+
 </div>
 
 <script>
-// Game data and logic
-const allQuestions = [];
+// ============================================================
+// 厳選設問データベース
+// 設計方針：どちらの選択肢も自然に選べる。「正解」が見えない。
+// 両方の選択肢に共感できる設計にし、偏りを排除。
+//
+// スコアリング軸：
+//   rationality:      合理性 (高=期待値に沿う選択, 低=心理的バイアスに沿う選択)
+//   system:           思考システム (高=System2的, 低=System1的)
+//   lossAversion:     損失回避 (高=損失回避型, 低=挑戦志向型)
+//   timeOrientation:  時間志向 (高=未来志向, 低=現在志向)
+// ============================================================
+
+const allQuestions = [
+
+  // ===== プロスペクト理論：利得局面のリスク選好 =====
+  {
+    category: "プロスペクト理論",
+    scenario: "臨時ボーナスの受け取り方を選べます。",
+    question: "確実に10万円もらう vs 50%の確率で25万円（50%で0円）。どちらにしますか？",
+    choices: [
+      { text: "確実に10万円を受け取る", scores: { rationality: -1, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "50%で25万円に賭ける（期待値12.5万円）", scores: { rationality: 1, system: 0, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979) Prospect Theory"
+  },
+  {
+    category: "プロスペクト理論",
+    scenario: "友人とのじゃんけんゲーム。",
+    question: "確実に3,000円もらえる vs じゃんけんで勝てば1万円、負ければ0円。",
+    choices: [
+      { text: "確実に3,000円もらう", scores: { rationality: -1, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "じゃんけんで1万円を狙う（期待値5,000円）", scores: { rationality: 1, system: 0, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+  {
+    category: "プロスペクト理論",
+    scenario: "くじ引きに当たりました。賞品の受け取り方を選べます。",
+    question: "確実に5万円の商品券 vs 30%の確率で20万円の旅行券（70%でハズレ）。",
+    choices: [
+      { text: "確実な5万円の商品券", scores: { rationality: -1, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "30%で20万円の旅行券に賭ける（期待値6万円）", scores: { rationality: 1, system: 0, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+
+  // ===== プロスペクト理論：損失局面のリスク選好 =====
+  {
+    category: "プロスペクト理論",
+    scenario: "税金の追加徴収が発生しました。支払い方法を選べます。",
+    question: "確実に5万円を払う vs 25%の確率で20万円払う（75%で免除）。",
+    choices: [
+      { text: "確実に5万円を払って終わらせる", scores: { rationality: 1, system: 0, lossAversion: -1, timeOrientation: 0 } },
+      { text: "25%で20万円のリスクを取る（75%で免除）", scores: { rationality: -1, system: 0, lossAversion: 1, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+  {
+    category: "プロスペクト理論",
+    scenario: "家電が壊れました。修理保証に入っていませんでした。",
+    question: "確実に3万円の修理費を払う vs 自分で直す（60%で成功・無料、40%で完全に壊れて8万円の買い替え）。",
+    choices: [
+      { text: "3万円で確実に修理する", scores: { rationality: 1, system: 0, lossAversion: -1, timeOrientation: 0 } },
+      { text: "自分で直してみる", scores: { rationality: -1, system: 0, lossAversion: 1, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+
+  // ===== 時間割引：今 vs あと =====
+  {
+    category: "時間割引",
+    scenario: "お年玉の受け取り方を選べるとします。",
+    question: "今日の1万円 vs 1ヶ月後の1万1千円。",
+    choices: [
+      { text: "今日の1万円", scores: { rationality: -1, system: 0, lossAversion: 0, timeOrientation: -2 } },
+      { text: "1ヶ月後の1万1千円", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 2 } }
+    ],
+    ref: "Frederick et al. (2002)"
+  },
+  {
+    category: "時間割引",
+    scenario: "懸賞で当選しました。受け取り方を選べます。",
+    question: "今すぐ8万円 vs 1年後に10万円。",
+    choices: [
+      { text: "今すぐ8万円を受け取る", scores: { rationality: -1, system: 0, lossAversion: 0, timeOrientation: -2 } },
+      { text: "1年後の10万円を待つ", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 2 } }
+    ],
+    ref: "Frederick et al. (2002)"
+  },
+  {
+    category: "時間割引",
+    scenario: "退職金の受け取り方を選べます。",
+    question: "一括500万円 vs 10年間毎月5.5万円（合計660万円）。",
+    choices: [
+      { text: "一括で500万円を受け取る", scores: { rationality: 0, system: 0, lossAversion: 0, timeOrientation: -2 } },
+      { text: "10年分割で合計660万円", scores: { rationality: 0, system: 0, lossAversion: 0, timeOrientation: 2 } }
+    ],
+    ref: "Frederick et al. (2002)"
+  },
+  {
+    category: "時間割引",
+    scenario: "2つのギフト券から選べます。",
+    question: "今日もらえる5,000円分 vs 3ヶ月後の7,000円分。",
+    choices: [
+      { text: "今日の5,000円分", scores: { rationality: -1, system: 0, lossAversion: 0, timeOrientation: -2 } },
+      { text: "3ヶ月後の7,000円分", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 2 } }
+    ],
+    ref: "Frederick et al. (2002)"
+  },
+  {
+    category: "時間割引",
+    scenario: "副業の報酬体系を選べます。",
+    question: "毎月3万円の固定報酬 vs 成果報酬（半年後に成果に応じて0〜50万円）。",
+    choices: [
+      { text: "毎月3万円の安定収入", scores: { rationality: 0, system: 0, lossAversion: 1, timeOrientation: -1 } },
+      { text: "半年後の成果報酬に賭ける", scores: { rationality: 0, system: 0, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Frederick et al. (2002)"
+  },
+
+  // ===== メンタルアカウンティング =====
+  {
+    category: "メンタルアカウンティング",
+    scenario: "映画のチケット（1,800円）を買いましたが、映画館で失くしたことに気づきました。",
+    question: "もう1,800円払って映画を観ますか？",
+    choices: [
+      { text: "合計3,600円は高い。やめる", scores: { rationality: -1, system: 0, lossAversion: 1, timeOrientation: 0 } },
+      { text: "失くしたチケット代は関係ない。映画は観たいから買う", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Thaler (1999) Mental Accounting"
+  },
+  {
+    category: "メンタルアカウンティング",
+    scenario: "映画館に向かう途中で1,800円を落としました。",
+    question: "予定通り1,800円のチケットを買って映画を観ますか？",
+    choices: [
+      { text: "落としたお金のことは別。予定通り観る", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 0 } },
+      { text: "今日はお金を失くしたし、なんとなくやめておく", scores: { rationality: -1, system: 0, lossAversion: 1, timeOrientation: 0 } }
+    ],
+    ref: "Thaler (1999)"
+  },
+  {
+    category: "メンタルアカウンティング",
+    scenario: "思いがけず10万円が入りました。",
+    question: "この臨時収入、どう使いますか？",
+    choices: [
+      { text: "「ボーナスだし」いつもよりちょっと贅沢に使う", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: -1 } },
+      { text: "給料と同じ財布。いつもの基準で使い道を決める", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 1 } }
+    ],
+    ref: "Thaler (1985)"
+  },
+  {
+    category: "メンタルアカウンティング",
+    scenario: "旅行用に20万円を貯めていました。旅行が中止になりました。",
+    question: "このお金をどう扱いますか？",
+    choices: [
+      { text: "旅行用だから、別の旅行に使う", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "用途に関係なく、今一番必要なことに使う", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Thaler (1999)"
+  },
+
+  // ===== サンクコスト =====
+  {
+    category: "サンクコスト",
+    scenario: "5,000円払ったコンサートの当日、大雪で外出がつらい状況です。無料チケットなら行かない天気です。",
+    question: "どうしますか？",
+    choices: [
+      { text: "5,000円払ったのだから行く", scores: { rationality: -1, system: -1, lossAversion: 2, timeOrientation: 0 } },
+      { text: "天気が悪いから行かない。5,000円は戻らないし", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Arkes & Blumer (1985)"
+  },
+  {
+    category: "サンクコスト",
+    scenario: "2時間待って入ったラーメン屋。一口食べたら好みの味ではありませんでした。",
+    question: "どうしますか？",
+    choices: [
+      { text: "2時間並んだんだし、全部食べる", scores: { rationality: -1, system: -1, lossAversion: 2, timeOrientation: 0 } },
+      { text: "好みじゃないなら残して出る。待ち時間は関係ない", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Arkes & Blumer (1985)"
+  },
+  {
+    category: "サンクコスト",
+    scenario: "半年間取り組んだ趣味のプロジェクト。最近やっていて楽しくないと感じています。",
+    question: "どうしますか？",
+    choices: [
+      { text: "せっかくここまでやったのだから完成させたい", scores: { rationality: -1, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "楽しくないなら、別のことに時間を使う", scores: { rationality: 1, system: 0, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Arkes & Blumer (1985)"
+  },
+  {
+    category: "サンクコスト",
+    scenario: "年間パスポートを買ったテーマパーク。最近は行っても楽しめなくなってきました。",
+    question: "「元を取る」ために行き続けますか？",
+    choices: [
+      { text: "せっかく買ったし、もう少し行く", scores: { rationality: -1, system: -1, lossAversion: 2, timeOrientation: -1 } },
+      { text: "楽しくないなら行かない。パス代は戻らないし", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Arkes & Blumer (1985)"
+  },
+
+  // ===== フレーミング効果 =====
+  {
+    category: "フレーミング効果",
+    scenario: "600人が影響する疫病対策。2つの対策から1つを選びます。",
+    question: "対策A：200人が確実に助かる vs 対策B：1/3で全員助かるが、2/3で誰も助からない。（期待値は同じ）",
+    choices: [
+      { text: "対策A（200人が確実に助かる）", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "対策B（1/3の確率で全員助かる）", scores: { rationality: 0, system: 0, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1981) Asian Disease Problem"
+  },
+  {
+    category: "フレーミング効果",
+    scenario: "同じ疫病対策を別の表現で。",
+    question: "対策C：400人が確実に亡くなる vs 対策D：1/3で誰も亡くならず、2/3で全員亡くなる。（期待値は同じ）",
+    choices: [
+      { text: "対策C（400人が確実に亡くなる）", scores: { rationality: 0, system: 1, lossAversion: -1, timeOrientation: 0 } },
+      { text: "対策D（1/3で誰も亡くならない可能性）", scores: { rationality: 0, system: -1, lossAversion: 1, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1981)"
+  },
+
+  // ===== 保有効果 =====
+  {
+    category: "保有効果",
+    scenario: "コンサートチケットを定価1万円で購入しました。当日、3万円で買いたいという人が現れました。",
+    question: "売りますか？",
+    choices: [
+      { text: "楽しみにしていたので売らない", scores: { rationality: -1, system: 0, lossAversion: 1, timeOrientation: 0 } },
+      { text: "3万円は大きい。売って別の楽しみに使う", scores: { rationality: 1, system: 0, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Thaler (1980) Endowment Effect"
+  },
+  {
+    category: "保有効果",
+    scenario: "10年乗って愛着のある車。修理費が年間30万円かかっています。同等の中古車は50万円で買えます。",
+    question: "乗り換えますか？",
+    choices: [
+      { text: "この車が好きだし、修理して乗り続ける", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: -1 } },
+      { text: "コストを考えて乗り換える", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Thaler (1980)"
+  },
+  {
+    category: "保有効果",
+    scenario: "昔集めたコレクション。今は興味がないけれど、フリマで売れば5万円になります。",
+    question: "売りますか？",
+    choices: [
+      { text: "思い出があるので手元に置いておく", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: 0 } },
+      { text: "興味がないなら現金化する", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman, Knetsch & Thaler (1990)"
+  },
+
+  // ===== 代表性ヒューリスティック =====
+  {
+    category: "代表性ヒューリスティック",
+    scenario: "リンダは31歳、独身、率直な性格。哲学専攻で、学生時代は社会運動に参加していました。",
+    question: "リンダは「銀行員」と「社会活動家の銀行員」、どちらの可能性が高い？",
+    choices: [
+      { text: "社会活動家の銀行員（経歴と合う気がする）", scores: { rationality: -2, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "銀行員（条件が少ないほうが確率は必ず高い）", scores: { rationality: 2, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1983) Conjunction Fallacy"
+  },
+  {
+    category: "代表性ヒューリスティック",
+    scenario: "コインを5回投げて、すべて表が出ました。",
+    question: "6回目はどうなると思いますか？",
+    choices: [
+      { text: "そろそろ裏が出そうな気がする", scores: { rationality: -2, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "表も裏も50%。過去の結果は関係ない", scores: { rationality: 2, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1974) Gambler's Fallacy"
+  },
+  {
+    category: "代表性ヒューリスティック",
+    scenario: "ある人の紹介：「物静かで整理好き。本が好き。」",
+    question: "この人は図書館司書と農家、どちらだと思いますか？",
+    choices: [
+      { text: "図書館司書っぽい", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "農家の人口のほうがずっと多いから、確率的には農家", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1974) Base Rate Neglect"
+  },
+
+  // ===== 投資行動（ディスポジション効果） =====
+  {
+    category: "ディスポジション効果",
+    scenario: "持っている株が買値から20%上がっています。今後の見通しは不透明です。",
+    question: "売って利益を確定しますか？",
+    choices: [
+      { text: "利益があるうちに売っておく", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: -1 } },
+      { text: "まだ上がるかもしれないので持ち続ける", scores: { rationality: 0, system: 0, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Shefrin & Statman (1985) Disposition Effect"
+  },
+  {
+    category: "ディスポジション効果",
+    scenario: "持っている株が買値から20%下がっています。今後の見通しは不透明です。",
+    question: "損切りしますか？",
+    choices: [
+      { text: "損を確定させたくない。回復を待つ", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "これ以上下がるリスクを考えて売る", scores: { rationality: 0, system: 0, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Shefrin & Statman (1985)"
+  },
+
+  // ===== 現在バイアス：行動のタイミング =====
+  {
+    category: "現在バイアス",
+    scenario: "気になる資格の勉強。「来月からちゃんとやろう」と何度も思っています。",
+    question: "今回はどうしますか？",
+    choices: [
+      { text: "今日はゆっくりして、来月から本気出す", scores: { rationality: 0, system: -1, lossAversion: 0, timeOrientation: -2 } },
+      { text: "とりあえず15分だけでも今日やる", scores: { rationality: 0, system: 1, lossAversion: 0, timeOrientation: 2 } }
+    ],
+    ref: "O'Donoghue & Rabin (1999)"
+  },
+  {
+    category: "現在バイアス",
+    scenario: "金曜夜。疲れています。週末に片付けたい家事があります。",
+    question: "どうしますか？",
+    choices: [
+      { text: "今夜はゆっくり休んで、明日やる", scores: { rationality: 0, system: -1, lossAversion: 0, timeOrientation: -1 } },
+      { text: "少しだけ片付けておく。明日の自分が楽になる", scores: { rationality: 0, system: 1, lossAversion: 0, timeOrientation: 1 } }
+    ],
+    ref: "O'Donoghue & Rabin (1999)"
+  },
+  {
+    category: "現在バイアス",
+    scenario: "夜10時。明日は朝から予定があります。",
+    question: "面白いドラマの続きが気になります。",
+    choices: [
+      { text: "もう1話だけ観てから寝る", scores: { rationality: 0, system: -1, lossAversion: 0, timeOrientation: -2 } },
+      { text: "明日のために今日は寝る", scores: { rationality: 0, system: 1, lossAversion: 0, timeOrientation: 2 } }
+    ],
+    ref: "O'Donoghue & Rabin (1999)"
+  },
+
+  // ===== ピークエンドの法則 =====
+  {
+    category: "ピークエンドの法則",
+    scenario: "全体的に最高だった旅行。でも最後の日だけ荷物を紛失してひどい目に遭いました。",
+    question: "この旅行、また行きたいと思いますか？",
+    choices: [
+      { text: "最後の印象が強くて、ちょっと微妙…", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: 0 } },
+      { text: "全体的には最高だったし、また行きたい", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman et al. (1993)"
+  },
+  {
+    category: "ピークエンドの法則",
+    scenario: "3時間の映画。前半は退屈でしたが、ラスト30分が感動的でした。",
+    question: "友人にこの映画をすすめますか？",
+    choices: [
+      { text: "ラストが良かったからすすめる", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "前半が退屈だったことも伝えた上で、判断は任せる", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman et al. (1993)"
+  },
+
+  // ===== 選択のパラドックス =====
+  {
+    category: "選択のパラドックス",
+    scenario: "お土産を買いに来ました。30種類の限定スイーツが並んでいます。",
+    question: "あなたの行動は？",
+    choices: [
+      { text: "いろいろ迷って、結局一番人気のものにする", scores: { rationality: 0, system: -1, lossAversion: 1, timeOrientation: 0 } },
+      { text: "最初に目についた好みのものを2〜3個パッと選ぶ", scores: { rationality: 0, system: 1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Iyengar & Lepper (2000)"
+  },
+  {
+    category: "選択のパラドックス",
+    scenario: "レストランのメニューが100品以上あります。",
+    question: "あなたはどうしますか？",
+    choices: [
+      { text: "全部見てから決めたい。後悔したくない", scores: { rationality: 0, system: 1, lossAversion: 1, timeOrientation: 0 } },
+      { text: "ジャンルを決めてその中からサッと選ぶ", scores: { rationality: 0, system: -1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Schwartz (2004)"
+  },
+
+  // ===== 後知恵バイアス =====
+  {
+    category: "後知恵バイアス",
+    scenario: "半年前に迷って買わなかった株が3倍になりました。",
+    question: "振り返ってどう思いますか？",
+    choices: [
+      { text: "やっぱり買っておけばよかった…", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: 0 } },
+      { text: "当時の判断は間違ってなかった。結果論だし", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Fischhoff (1975)"
+  },
+  {
+    category: "後知恵バイアス",
+    scenario: "昨年の台風で被害がありました。「やっぱり備えておくべきだった」と感じています。",
+    question: "正直、事前に予測できていましたか？",
+    choices: [
+      { text: "実はなんとなく「やばいかも」とは思っていた", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "正直、あそこまでとは思っていなかった", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Fischhoff (1975)"
+  },
+
+  // ===== 現状維持バイアス =====
+  {
+    category: "現状維持バイアス",
+    scenario: "今の携帯料金プランより月1,500円安いプランを見つけました。切り替えには30分の手続きが必要です。",
+    question: "切り替えますか？",
+    choices: [
+      { text: "手続きが面倒だし、今のままでいい", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: -1 } },
+      { text: "年間18,000円の節約になるから切り替える", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Samuelson & Zeckhauser (1988)"
+  },
+  {
+    category: "現状維持バイアス",
+    scenario: "10年以上同じ銀行を使っています。他行のほうが金利が良いです。",
+    question: "口座を移しますか？",
+    choices: [
+      { text: "長年使っているし、このままでいい", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: -1 } },
+      { text: "差額を計算して、得なら移す", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Samuelson & Zeckhauser (1988)"
+  },
+
+  // ===== アンカリング（数値判断） =====
+  {
+    category: "アンカリング効果",
+    scenario: "フリマアプリで出品者が「定価5万円、3万円で出品」と書いています。市場相場はわかりません。",
+    question: "この価格、どう感じますか？",
+    choices: [
+      { text: "定価の4割引なら悪くない", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "定価は売り手が書いただけ。他の出品者の価格を確認する", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1974)"
+  },
+  {
+    category: "アンカリング効果",
+    scenario: "不動産屋が最初に5,000万円の物件を見せた後、4,200万円の物件を紹介しました。",
+    question: "4,200万円の物件、どう感じますか？",
+    choices: [
+      { text: "さっきの物件より800万も安い。お得に感じる", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "「お得感」は最初の物件との比較でしかない。独立して評価する", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Tversky & Kahneman (1974)"
+  },
+
+  // ===== 社会的選好と公正感 =====
+  {
+    category: "最後通牒ゲーム",
+    scenario: "見知らぬ人と1万円を分けます。相手が分け方を提案し、あなたが受けるか拒否するかを決めます。拒否すれば両者とも0円です。",
+    question: "相手が「8,000円：2,000円（あなたの取り分は2,000円）」を提案しました。",
+    choices: [
+      { text: "不公平だから拒否する（両者0円）", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "2,000円でも0円よりマシ。受け入れる", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Güth et al. (1982) Ultimatum Game"
+  },
+  {
+    category: "最後通牒ゲーム",
+    scenario: "同じゲームで、相手が「7,000円：3,000円」を提案しました。",
+    question: "受け入れますか？",
+    choices: [
+      { text: "7:3はまだ不公平。拒否する", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "3,000円もらえるなら受け入れる", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Güth et al. (1982)"
+  },
+  {
+    category: "独裁者ゲーム",
+    scenario: "あなたが1万円の分け方を一方的に決められます。相手は拒否できません。",
+    question: "いくら渡しますか？",
+    choices: [
+      { text: "半分の5,000円を渡す", scores: { rationality: -1, system: 0, lossAversion: 0, timeOrientation: 0 } },
+      { text: "相手には1,000〜2,000円程度にして、自分の取り分を多くする", scores: { rationality: 1, system: 0, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman, Knetsch & Thaler (1986) Dictator Game"
+  },
+
+  // ===== 確実性効果 =====
+  {
+    category: "確実性効果",
+    scenario: "2つの投資信託から1つを選びます。",
+    question: "A：確実に年利3% vs B：80%で年利5%、20%で元本割れ（-2%）。",
+    choices: [
+      { text: "A：確実な年利3%", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: 1 } },
+      { text: "B：期待値は高いがリスクあり", scores: { rationality: 0, system: 0, lossAversion: -2, timeOrientation: 1 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+  {
+    category: "確実性効果",
+    scenario: "2つの仕事のオファーがあります。",
+    question: "A：年収600万（安定企業） vs B：年収400万＋ストックオプション（成功すれば数千万円の可能性）。",
+    choices: [
+      { text: "A：安定した年収600万", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "B：リスクはあるが大きなリターンの可能性", scores: { rationality: 0, system: 0, lossAversion: -2, timeOrientation: 1 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+
+  // ===== 損失回避と日常判断 =====
+  {
+    category: "損失回避",
+    scenario: "コイントスのゲームに誘われました。",
+    question: "表なら1万5千円もらえる。裏なら1万円を払う。やりますか？（期待値はプラス）",
+    choices: [
+      { text: "1万円失うのが嫌なのでやらない", scores: { rationality: -1, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "期待値がプラスだからやる", scores: { rationality: 1, system: 0, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+  {
+    category: "損失回避",
+    scenario: "新しいスキルを学ぶ講座があります。3万円で、習得できれば仕事の幅が広がります。",
+    question: "ただし、忙しくて途中で挫折する可能性もあります。",
+    choices: [
+      { text: "3万円が無駄になるかもしれないからやめておく", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: -1 } },
+      { text: "得られるものを考えて、挑戦する", scores: { rationality: 0, system: 0, lossAversion: -2, timeOrientation: 1 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+
+  // ===== 確率の直感 =====
+  {
+    category: "確率の直感",
+    scenario: "宝くじ（1/1000万の確率で1億円当選）が目の前で売られています。300円です。",
+    question: "買いますか？",
+    choices: [
+      { text: "夢を買うと思って1枚買う", scores: { rationality: -1, system: -1, lossAversion: -1, timeOrientation: 0 } },
+      { text: "期待値がマイナスなので買わない", scores: { rationality: 1, system: 1, lossAversion: 1, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979) Overweighting of Small Probabilities"
+  },
+  {
+    category: "確率の直感",
+    scenario: "飛行機の保険（500円で1億円の補償）。通常の旅行保険には入っています。",
+    question: "追加で飛行機事故だけの保険に入りますか？",
+    choices: [
+      { text: "万が一を考えて入っておく", scores: { rationality: -1, system: -1, lossAversion: 1, timeOrientation: 0 } },
+      { text: "事故の確率を考えると不要。通常の保険で十分", scores: { rationality: 1, system: 1, lossAversion: -1, timeOrientation: 0 } }
+    ],
+    ref: "Kahneman & Tversky (1979)"
+  },
+
+  // ===== 社会的割引 =====
+  {
+    category: "社会的選好",
+    scenario: "あなたと友人にボーナスが出ます。2つの配分から選べます。",
+    question: "A：あなた50万、友人50万 vs B：あなた60万、友人80万。",
+    choices: [
+      { text: "A（同額のほうが気持ちいい）", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "B（自分も10万円多くもらえるし）", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Fehr & Schmidt (1999) Inequity Aversion"
+  },
+
+  // ===== コミットメントデバイス =====
+  {
+    category: "コミットメント",
+    scenario: "ダイエットを始めます。友人が「3ヶ月で目標達成できなかったら私に1万円払う約束にしない？」と提案しました。",
+    question: "この約束、受けますか？",
+    choices: [
+      { text: "プレッシャーになりそうだし、やめておく", scores: { rationality: 0, system: 0, lossAversion: 1, timeOrientation: -1 } },
+      { text: "自分を追い込むために受ける", scores: { rationality: 0, system: 0, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Ariely & Wertenbroch (2002)"
+  },
+  {
+    category: "コミットメント",
+    scenario: "毎月の貯金がなかなか続きません。",
+    question: "「給料から自動的に3万円を積立」の設定をしますか？",
+    choices: [
+      { text: "急な出費に対応できなくなりそうだから、手動で管理する", scores: { rationality: 0, system: 0, lossAversion: 1, timeOrientation: -1 } },
+      { text: "自動積立にして、意思力に頼らない仕組みにする", scores: { rationality: 0, system: 0, lossAversion: -1, timeOrientation: 1 } }
+    ],
+    ref: "Thaler & Benartzi (2004) Save More Tomorrow"
+  },
+
+  // ===== 感情と意思決定 =====
+  {
+    category: "感情ヒューリスティック",
+    scenario: "お腹が空いているときにスーパーに来ました。",
+    question: "いつもより多く買い物しそうだと自覚しています。",
+    choices: [
+      { text: "せっかく来たし、目についたものも買っていく", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: -1 } },
+      { text: "買い物リストにあるものだけにしておく", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 1 } }
+    ],
+    ref: "Loewenstein (1996) Visceral Factors"
+  },
+  {
+    category: "感情ヒューリスティック",
+    scenario: "仕事でイライラした日の帰り道。",
+    question: "いつもは素通りするお店で「自分へのご褒美」を買いたくなりました。",
+    choices: [
+      { text: "たまにはいい。今日は自分を甘やかす", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: -1 } },
+      { text: "気分で判断するのは避ける。本当に欲しいか明日考える", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 1 } }
+    ],
+    ref: "Loewenstein (1996)"
+  },
+
+  // ===== デフォルト効果 =====
+  {
+    category: "デフォルト効果",
+    scenario: "新しいアプリをインストールしました。通知がデフォルトでONになっています。",
+    question: "通知設定を変更しますか？",
+    choices: [
+      { text: "デフォルトのまま使う", scores: { rationality: -1, system: -1, lossAversion: 0, timeOrientation: 0 } },
+      { text: "自分の好みに合わせて設定を変える", scores: { rationality: 1, system: 1, lossAversion: 0, timeOrientation: 0 } }
+    ],
+    ref: "Johnson & Goldstein (2003)"
+  },
+
+  // ===== 日常のリスク判断 =====
+  {
+    category: "リスク選好",
+    scenario: "レストランで注文します。",
+    question: "いつも頼んで間違いない定番メニュー vs 新作メニュー（当たりハズレがある）。",
+    choices: [
+      { text: "いつもの定番にする", scores: { rationality: 0, system: -1, lossAversion: 2, timeOrientation: 0 } },
+      { text: "新作を試してみる", scores: { rationality: 0, system: 1, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Schwartz (2004)"
+  },
+  {
+    category: "リスク選好",
+    scenario: "週末の予定を立てています。",
+    question: "行ったことのある好きな場所 vs まだ行ったことのない評判の場所。",
+    choices: [
+      { text: "確実に楽しめるいつもの場所", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: 0 } },
+      { text: "新しい場所を開拓する", scores: { rationality: 0, system: 0, lossAversion: -2, timeOrientation: 0 } }
+    ],
+    ref: "Schwartz (2004)"
+  },
+  {
+    category: "リスク選好",
+    scenario: "転職を考えています。",
+    question: "今の会社は居心地がいいけれど成長は鈍化。新しい会社はチャレンジングだが不確実。",
+    choices: [
+      { text: "居心地のいい今の環境を大切にする", scores: { rationality: 0, system: 0, lossAversion: 2, timeOrientation: -1 } },
+      { text: "成長のためにチャレンジする", scores: { rationality: 0, system: 0, lossAversion: -2, timeOrientation: 1 } }
+    ],
+    ref: "Samuelson & Zeckhauser (1988)"
+  }
+];
+
+// ============================================================
+// ゲームロジック
+// ============================================================
+
+let currentQuestions = [];
+let currentIndex = 0;
+let scores = { rationality: 0, system: 0, lossAversion: 0, timeOrientation: 0 };
+let timerInterval = null;
+let timerStart = 0;
+const TIMER_DURATION = 30;
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function startGame() {
+  currentQuestions = shuffleArray(allQuestions).slice(0, 10);
+  currentIndex = 0;
+  scores = { rationality: 0, system: 0, lossAversion: 0, timeOrientation: 0 };
+
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('game-screen').style.display = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = currentQuestions[currentIndex];
+
+  document.getElementById('progress-bar').style.width = ((currentIndex) / currentQuestions.length * 100) + '%';
+  document.getElementById('question-counter').textContent = `Q${currentIndex + 1} / ${currentQuestions.length}`;
+  document.getElementById('question-category').textContent = q.category;
+
+  const card = document.getElementById('question-card');
+  card.classList.remove('slide-in');
+  void card.offsetWidth;
+  card.classList.add('slide-in');
+
+  document.getElementById('scenario').textContent = q.scenario;
+  document.getElementById('question-text').textContent = q.question;
+
+  const choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
+
+  q.choices.forEach((choice, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = choice.text;
+    btn.onclick = () => selectChoice(idx);
+    choicesDiv.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerStart = Date.now();
+  const fill = document.getElementById('timer-fill');
+  fill.style.width = '100%';
+  fill.style.background = 'var(--green)';
+
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - timerStart) / 1000;
+    const pct = Math.max(0, 1 - elapsed / TIMER_DURATION) * 100;
+    fill.style.width = pct + '%';
+
+    if (pct < 30) fill.style.background = 'var(--accent2)';
+    else if (pct < 60) fill.style.background = 'var(--orange)';
+
+    if (elapsed >= TIMER_DURATION) {
+      clearInterval(timerInterval);
+      scores.system -= 1;
+      nextQuestion();
+    }
+  }, 100);
+}
+
+function selectChoice(idx) {
+  clearInterval(timerInterval);
+
+  const q = currentQuestions[currentIndex];
+  const choice = q.choices[idx];
+
+  const elapsed = (Date.now() - timerStart) / 1000;
+  if (elapsed < 3) {
+    scores.system -= 1;
+  } else if (elapsed > 15) {
+    scores.system += 1;
+  }
+
+  Object.keys(choice.scores).forEach(key => {
+    scores[key] += choice.scores[key];
+  });
+
+  const btns = document.querySelectorAll('.choice-btn');
+  btns[idx].classList.add('selected');
+  btns.forEach(b => b.style.pointerEvents = 'none');
+
+  setTimeout(() => nextQuestion(), 400);
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < currentQuestions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+// ============================================================
+// 結果表示
+// ============================================================
+
+function normalizeScore(raw, maxPossible) {
+  const clamped = Math.max(-maxPossible, Math.min(maxPossible, raw));
+  return Math.round(((clamped + maxPossible) / (2 * maxPossible)) * 100);
+}
+
+function showResult() {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('progress-bar').style.width = '100%';
+
+  const rationalPct = normalizeScore(scores.rationality, 15);
+  const systemPct = normalizeScore(scores.system, 18);
+  const lossAversionPct = 100 - normalizeScore(scores.lossAversion, 18);
+  const timePct = normalizeScore(scores.timeOrientation, 15);
+
+  const typeName = getTypeName(rationalPct, systemPct, lossAversionPct, timePct);
+  document.getElementById('type-name').textContent = typeName;
+
+  const gauges = [
+    { left: '合理的', right: '非合理的', value: rationalPct, color1: '#4ecdc4', color2: '#ff6584' },
+    { left: '熟考型 (System 2)', right: '直感型 (System 1)', value: systemPct, color1: '#6c63ff', color2: '#ffbe76' },
+    { left: '挑戦志向', right: '損失回避', value: lossAversionPct, color1: '#f78fb3', color2: '#3dc1d3' },
+    { left: '未来志向', right: '現在志向', value: timePct, color1: '#a29bfe', color2: '#fd79a8' },
+  ];
+
+  const gaugeSection = document.getElementById('gauge-section');
+  gaugeSection.innerHTML = '';
+
+  gauges.forEach((g, i) => {
+    const item = document.createElement('div');
+    item.className = 'gauge-item';
+    item.innerHTML = `
+      <div class="gauge-label">
+        <span class="left">${g.left}</span>
+        <span class="right">${g.right}</span>
+      </div>
+      <div class="gauge-track">
+        <div class="gauge-fill" style="width: 0%; background: linear-gradient(90deg, ${g.color1}, ${g.color2});"></div>
+      </div>
+      <div class="gauge-value">${g.value}%</div>
+    `;
+    gaugeSection.appendChild(item);
+
+    setTimeout(() => {
+      item.querySelector('.gauge-fill').style.width = g.value + '%';
+    }, 200 + i * 200);
+  });
+
+  const insights = document.getElementById('insights');
+  insights.innerHTML = '';
+
+  const insightData = generateInsights(rationalPct, systemPct, lossAversionPct, timePct);
+  insightData.forEach(ins => {
+    const card = document.createElement('div');
+    card.className = 'insight-card';
+    card.innerHTML = `
+      <h3>${ins.title}</h3>
+      <p>${ins.text}</p>
+      <div class="reference">${ins.ref}</div>
+    `;
+    insights.appendChild(card);
+  });
+}
+
+function getTypeName(rational, system, challengeOriented, future) {
+  const r = rational >= 50;
+  const s = system >= 50;
+  const c = challengeOriented >= 50;
+  const f = future >= 50;
+
+  if (r && s && c && f) return '戦略的アナリスト型';
+  if (r && s && !c && f) return '慎重な計画者型';
+  if (r && s && c && !f) return 'リスクテイカー型';
+  if (r && !s && c && f) return '直感的リーダー型';
+  if (!r && s && c && f) return '理想主義者型';
+  if (!r && !s && !c && !f) return '感覚的エンジョイヤー型';
+  if (!r && !s && c && f) return '楽天的チャレンジャー型';
+  if (!r && s && !c && !f) return '分析的慎重派型';
+  if (r && !s && !c && !f) return '堅実なリアリスト型';
+  if (!r && !s && !c && f) return '夢見る安全志向型';
+  if (r && !s && !c && f) return '直感的プランナー型';
+  if (!r && s && c && !f) return '知的冒険家型';
+  if (r && s && !c && !f) return '守りの戦略家型';
+  if (!r && !s && c && !f) return '衝動的チャレンジャー型';
+  if (!r && s && !c && f) return '慎重な理論家型';
+  return 'バランス型';
+}
+
+function generateInsights(rational, system, challengeOriented, future) {
+  const insights = [];
+
+  if (rational < 40) {
+    insights.push({
+      title: '心理的バイアスの影響を受けやすい',
+      text: '感情や直感が判断に大きく影響しています。これは人間として自然なことで、日常の多くの場面では直感が正しい判断を導きます。ただし、金額が大きい判断や長期的な影響がある場面では、一度立ち止まって考える習慣が役立つかもしれません。',
+      ref: '参考: Kahneman (2011) "Thinking, Fast and Slow"'
+    });
+  } else if (rational > 60) {
+    insights.push({
+      title: '期待値に基づく判断が得意',
+      text: 'バイアスに惑わされず、数字や確率に基づいた判断ができる傾向があります。ビジネスや投資の場面で強みになりますが、人間関係や感情が重要な場面では「合理的すぎる」判断が裏目に出ることもあります。',
+      ref: '参考: Gigerenzer (2007) "Gut Feelings"'
+    });
+  }
+
+  if (system < 40) {
+    insights.push({
+      title: 'System 1（直感的思考）優位',
+      text: '素早い判断が得意で、日常の意思決定を効率的にこなせます。多くの場面で直感は優れたガイドになりますが、統計や確率が関わる問題では意識的にスピードを落とすと精度が上がるかもしれません。',
+      ref: '参考: Kahneman (2011) System 1 / System 2'
+    });
+  } else if (system > 60) {
+    insights.push({
+      title: 'System 2（熟考的思考）優位',
+      text: '論理的に考え抜く力があります。複雑な判断に強い一方、「考えすぎ」で決断が遅れたり、シンプルな場面で不必要に迷うこともあるかもしれません。ときには「十分に良い」選択で満足するのも一つの戦略です。',
+      ref: '参考: Kahneman (2011) / Schwartz (2004) Satisficing'
+    });
+  }
+
+  if (challengeOriented < 40) {
+    insights.push({
+      title: '損失回避傾向が強い',
+      text: '人は同じ金額でも、得る喜びより失う痛みを約2倍強く感じます（損失回避）。安定を重視する堅実な判断ができる一方、チャンスを逃しやすい面もあります。「最悪の場合どうなるか」を具体的に想像すると、恐怖が和らぐことがあります。',
+      ref: '参考: Kahneman & Tversky (1979) Prospect Theory'
+    });
+  } else if (challengeOriented > 60) {
+    insights.push({
+      title: '挑戦志向が強い',
+      text: 'リスクを恐れずに新しいことに飛び込める行動力があります。成長の原動力になりますが、「失敗のコスト」を冷静に見積もることも忘れずに。特に取り返しのつかない判断では、慎重さとのバランスが鍵です。',
+      ref: '参考: Kahneman & Tversky (1979) Prospect Theory'
+    });
+  }
+
+  if (future < 40) {
+    insights.push({
+      title: '現在志向（現在バイアス）',
+      text: '「今」の満足を大切にする傾向があります。人生を楽しむ力がある一方、将来のために必要な行動を先延ばしにしがちかもしれません。自動積立や事前コミットメントなど、意思力に頼らない仕組みが効果的です。',
+      ref: '参考: Frederick et al. (2002) / Thaler & Benartzi (2004)'
+    });
+  } else if (future > 60) {
+    insights.push({
+      title: '未来志向',
+      text: '将来を見据えた計画的な判断ができます。貯蓄や自己投資に強みがある一方、「今この瞬間を楽しむ」ことを後回しにしすぎていないか、たまに振り返ってみてください。',
+      ref: '参考: Frederick et al. (2002)'
+    });
+  }
+
+  if (insights.length === 0) {
+    insights.push({
+      title: 'バランスの取れた意思決定',
+      text: '直感と分析、安定とリスク、現在と未来のバランスが取れた意思決定スタイルです。状況に応じて柔軟に判断できる強みがあります。',
+      ref: '参考: Kahneman (2011) "Thinking, Fast and Slow"'
+    });
+  }
+
+  return insights;
+}
+
+function shareResult() {
+  const typeName = document.getElementById('type-name').textContent;
+  const text = `行動経済学テストの結果、私は「${typeName}」でした！あなたもやってみて→`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'あなたの意思決定タイプ診断', text: text });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('結果をクリップボードにコピーしました！SNSに貼り付けてシェアしてください。');
+    });
+  } else {
+    prompt('以下のテキストをコピーしてシェアしてください：', text);
+  }
 }
 
 function retryGame() {
   document.getElementById('result-screen').style.display = 'none';
   startGame();
 }
-
-function shareResult() {
-  const typeName = document.getElementById('type-name').textContent;
-  const text = "行動経済学の意思決定診断:" + typeName;
-  if (navigator.share) {
-    navigator.share({ title: 'あなたの意思決定タイプ診断', text: text });
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('結果をコピーしました！SNSでシェアしてください。');
-    });
-  } else {
-    prompt('こちらをコピーしてシェアしてください:', text);
-  }
-}
 </script>
+
 </body>
 </html>
